@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>XOX o'yini</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background-color: #f0f0f0;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      cursor: pointer;
+      border: 2px solid #444;
+    }
+
+    .cell:hover {
+      background-color: #e0e0e0;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+
+    .restart-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>XOX o'yini</h1>
+  <div class="board" id="board"></div>
+  <div class="status" id="status">Navbat: X</div>
+  <button class="restart-btn" onclick="restartGame()">Qayta boshlash</button>
+
+  <script>
+    const board = document.getElementById('board');
+    const statusText = document.getElementById('status');
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let gameState = ["", "", "", "", "", "", "", "", ""];
+
+    const winPatterns = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // gorizontal
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // vertikal
+      [0, 4, 8], [2, 4, 6]             // diagonal
+    ];
+
+    function createBoard() {
+      board.innerHTML = "";
+      gameState = ["", "", "", "", "", "", "", "", ""];
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.addEventListener('click', handleClick);
+        board.appendChild(cell);
+      }
+    }
+
+    function handleClick(e) {
+      const index = e.target.dataset.index;
+      if (gameState[index] !== "" || !gameActive) return;
+
+      gameState[index] = currentPlayer;
+      e.target.textContent = currentPlayer;
+
+      if (checkWinner()) {
+        statusText.textContent = `G'olib: ${currentPlayer}`;
+        gameActive = false;
+        return;
+      }
+
+      if (!gameState.includes("")) {
+        statusText.textContent = "Durrang!";
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      statusText.textContent = `Navbat: ${currentPlayer}`;
+    }
+
+    function checkWinner() {
+      return winPatterns.some(pattern => {
+        const [a, b, c] = pattern;
+        return gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c];
+      });
+    }
+
+    function restartGame() {
+      currentPlayer = 'X';
+      gameActive = true;
+      statusText.textContent = `Navbat: ${currentPlayer}`;
+      createBoard();
+    }
+
+    // Boshlanishida boardni yaratamiz
+    createBoard();
+  </script>
+</body>
+</html>
